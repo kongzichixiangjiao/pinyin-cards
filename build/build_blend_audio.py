@@ -27,10 +27,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data", "curriculum.json")
 AUDIO = os.path.join(ROOT, "assets", "audio")
 OVERRIDE = os.path.join(ROOT, "data", "audio_override")
+SYL = os.path.join(ROOT, "data", "audio_syllable")   # 真人录的音节优先
 
 VOICE = "zh-CN-XiaoyiNeural"
 RATE = "-18%"          # 放慢一点，孩子跟得上
-GAP = 0.35
+GAP = 0.12   # 三段之间只停 0.12 秒，连起来才顺
 
 
 def strip_tone(s):
@@ -150,8 +151,11 @@ def main():
                 else:
                     miss.append(key)
             # 最后一段：音节，用品词里那个字做 TTS
-            ch = find_char_for(it["text"], syl)
-            if ch:
+            rec = os.path.join(SYL, f"{it['id']:03d}.mp3")
+            ch = None if os.path.exists(rec) else find_char_for(it["text"], syl)
+            if os.path.exists(rec):
+                clips.append(rec)
+            elif ch:
                 seg = os.path.join(tmpdir, f"s{it['id']}.mp3")
                 await tts(ch, seg)
                 clips.append(seg)
