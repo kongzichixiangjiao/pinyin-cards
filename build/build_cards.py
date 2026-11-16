@@ -182,6 +182,33 @@ def draw_line_item(item, show_answer=True, size=S, chip_text="", hl=False, page=
     return img
 
 
+def hl_box(item, kind, answer=True, size=S):
+    """高亮框在卡片坐标系里的位置（网页用，避免多出一套图）"""
+    k = 1.0
+    d = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    kk = size / S
+    if kind == "letter":
+        box = [150, 378, size / kk - 150, 636]
+    elif kind == "blend":
+        if answer:
+            eq = item.get("blend") or item["pinyin"]
+            f = fit_font("sans_bold", eq, 800 * kk, int(112 * kk), int(56 * kk))
+            tw = d.textlength(eq, font=f) / kk
+            box = [450 - tw / 2 - 34, 474, 450 + tw / 2 + 34, 622]
+        else:
+            f = fit_font("song_bold", item["text"], 760 * kk, int(120 * kk), int(64 * kk))
+            tw = d.textlength(item["text"], font=f) / kk
+            box = [450 - tw / 2 - 30, 458, 450 + tw / 2 + 30, 622]
+    else:
+        hz = item["text"]
+        hsize = {1: 200, 2: 170, 3: 140, 4: 114}.get(len(hz), 96)
+        f = font("song_bold", int(hsize * kk))
+        tw = d.textlength(hz, font=f) / kk
+        box = [450 - tw / 2 - 32, 582 - hsize * 0.60, 450 + tw / 2 + 32, 582 + hsize * 0.60]
+    x0, y0, x1, y1 = [v * kk / size * 100 for v in box]
+    return [round(x0, 2), round(y0, 2), round(x1 - x0, 2), round(y1 - y0, 2)]
+
+
 RENDERERS = {"letter": draw_letter, "blend": draw_blend, "word": draw_word,
              "sentence": draw_line_item, "story": draw_line_item}
 

@@ -24,6 +24,16 @@ for lv in data["levels"]:
             assert os.path.exists(os.path.join(ROOT, "assets", "audio", f"{it['id']:03d}_hz.mp3")), \
                 f"缺音频: {it['id']:03d}"
 
+# 高亮框（网页跟读时圈出正在读的那个字/字母），构卡时算好，避免多生成一套图
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from build_cards import hl_box
+hl = {}
+for lv in data["levels"]:
+    for g in lv["groups"]:
+        for it in g["items"]:
+            hl[str(it["id"])] = hl_box(it, g["kind"], answer=True)
+data["hl"] = hl
+
 with open(TPL, encoding="utf-8") as f:
     html = f.read()
 

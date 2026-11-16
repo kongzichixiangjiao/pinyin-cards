@@ -218,3 +218,84 @@ L2 的拼读卡建议这样填（照 L1 的 letter 样式走）：
 6. 配图现在走的是系统 emoji（Apple Color Emoji）。自己教学用完全没问题；
    如果要对外商用发布、且介意字体授权，可以换成 Noto Emoji（OFL 协议，免费商用），
    把 SVG/PNG 放进 `assets/custom/` 按 id 覆盖即可，代码不用改。
+
+---
+
+## 九、上线（GitHub Pages，永久链接）
+
+先确认 `index.html` 是最新的，再推：
+
+```bash
+python3 build/optimize_images.py    # 有新增/改动卡片时必跑
+python3 build/build_index.py        # 重建 index.html（含邀请码）
+./deploy.sh git@github.com:<你>/<仓库>.git
+```
+
+`deploy.sh` 会做三件事：查资源是否齐全（缺图缺音直接拦下）→ 提交 → 推送；
+装了 `gh` 且已登录的话，还会顺手把 Pages 打开，并打印站点地址。
+
+不用脚本的手动版：仓库 Settings → Pages → Source 选 **Deploy from a branch** → `main` / `(root)`，1~2 分钟后生效。
+
+> ⚠️ GitHub Pages 免费版**只能用公开仓库**，等于卡片、音频、源码全部公开可搜。
+> 邀请码只能挡住"随手转发"，挡不住"顺着仓库翻"。
+> 要连源码一起藏，用 **Cloudflare Pages + 私有仓库**（免费），或 GitHub Pro。
+
+---
+
+## 十、邀请码
+
+`data/invites.json` 是唯一配置：
+
+```json
+{
+  "enabled": true,
+  "codes": [
+    { "code": "97DSJQ", "note": "家庭 1" },
+    { "code": "Y9D2AH", "note": "家庭 2" }
+  ]
+}
+```
+
+改完跑一次 `python3 build/build_index.py`，码就编进 `index.html` 了（纯前端白名单，没有后端）。
+
+两种发法：
+
+| 方式 | 家长要做什么 | 适合 |
+|---|---|---|
+| 只发 6 位码 | 打开首页 → 输码 → 进 | 群发同一条链接 |
+| 发专属链接 `站点/?k=97DSJQ` | 点开直接进 | 一对一发，省事 |
+
+```bash
+python3 build/invite_links.py https://<用户名>.github.io/<仓库>/        # 打印 10 条链接
+python3 build/invite_links.py https://xxx.github.io/pinyin/ --md       # 输出表格，方便贴群里
+```
+
+- 验证一次存在 `localStorage`，之后打开不用再输（换浏览器/清缓存要重输）
+- 专属链接里的 `?k=` 会**自动从地址栏抹掉**，家长不会手滑转发错的
+- 本地双击 `index.html`（`file://`）不走邀请码，自己用不受影响
+- 想把门关掉：`"enabled": false` 后重新 build
+
+**要注意**：这是纯前端的"门"，源码里能看到码，定位是"别让路人随便进"，不是真正的账号体系。
+真要按人记进度/错题，得接后端（Supabase 免费版就能做）。
+
+---
+
+## 十一、图片瘦身（WebP）
+
+`build/optimize_images.py` 把卡片 PNG 压成两档 WebP，原 PNG 全部保留（出片和打印仍然用 PNG）：
+
+| 产物 | 尺寸 | 用途 | 单张 |
+|---|---|---|---|
+| `assets/cards/thumb/003_card.webp` | 320×320 | 列表格子 | ~5 KB |
+| `assets/cards/web/003_card.webp` | 720×720 | 单卡大图 | ~16 KB |
+| `assets/cards/003_card.png` | 900×900 | 出片 / 打印 | ~100 KB |
+
+跑法：
+
+```bash
+python3 build/optimize_images.py           # 增量，只处理新增/改动
+python3 build/optimize_images.py --force   # 全部重压
+```
+
+- 会把源图已不存在的残留 webp 清掉（改 id / 删单元之后必备）
+- 老浏览器没有 WebP？`<img onerror>` 会自动退回 PNG，不用管

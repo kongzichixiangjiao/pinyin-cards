@@ -64,6 +64,12 @@ main{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
 .stage-card{width:min(540px,92vw);border-radius:26px;overflow:hidden;background:#fff;
   box-shadow:0 18px 50px rgba(45,90,130,.16);cursor:pointer}
 .stage-card img{display:block;width:100%;height:auto}
+.stage-card{position:relative}
+.hl{position:absolute;border:5px solid var(--accent);background:rgba(47,124,190,.12);
+  border-radius:18px;opacity:0;transition:opacity .16s;pointer-events:none;box-sizing:border-box}
+.hl.on{opacity:1;animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{background:rgba(47,124,190,.10)}50%{background:rgba(47,124,190,.22)}}
+.stage-card.reading{box-shadow:0 0 0 5px rgba(47,124,190,.30),0 18px 50px rgba(45,90,130,.16)}
 .nav-row{display:flex;align-items:center;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center}
 .btn{border:1px solid var(--line);background:#fff;color:var(--ink);font-family:inherit;font-size:15px;
   padding:12px 18px;border-radius:14px;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:8px}
@@ -218,8 +224,35 @@ const thumbOf = it => `assets/cards/thumb/${pad3(it.id)}_${kindOf()}.webp`;
 const pngOf = it => `assets/cards/${pad3(it.id)}_${kindOf()}.png`;
 const audioOf = it => `assets/audio/${pad3(it.id)}_hz.mp3`;
 
+let readPass = 0, playToken = 0;
+
+function hlBoxOf(it){
+  const box = (DATA.hl || {})[it.id];
+  const el = document.getElementById('hlBox');
+  if(!box || !el) return null;
+  el.style.left = box[0] + '%';
+  el.style.top = box[1] + '%';
+  el.style.width = box[2] + '%';
+  el.style.height = box[3] + '%';
+  return el;
+}
+
+function markReading(on){
+  const card = document.getElementById('bigCard');
+  const hl = document.getElementById('hlBox');
+  if(card) card.classList.toggle('reading', on);
+  if(hl) hl.classList.toggle('on', on);
+}
+
+/** 读两遍：第一遍 → 停 0.45 秒 → 第二遍；每一遍都把正在读的那个字圈起来 */
 function playItem(it){
-  player.pause(); player.src = audioOf(it); player.currentTime = 0;
+  const my = ++playToken;
+  readPass = 1;
+  hlBoxOf(it);
+  markReading(true);
+  player.pause();
+  player.src = audioOf(it);
+  player.currentTime = 0;
   player.play().catch(()=>{});
 }
 
@@ -403,18 +436,38 @@ function renderCard(id){
   document.getElementById('autoBtn').onclick = () => { autoNext = !autoNext; render(); if(autoNext) playItem(item); };
 
   const pre = ws[idx+1]; if(pre) new Image().src = imgOf(pre);
+  hlBoxOf(item);
   playItem(item);
 }
 
-player.addEventListener('ended', () => {
+function maybeAdvance(){
   if(!autoNext) return;
   const seg = location.hash.replace(/^#\/?/, '').split('/');
   if(seg[0] !== 'card') return;
   const x = IDX[+seg[1]]; if(!x) return;
   const ws = x.group.items, idx = ws.findIndex(i => i.id === x.item.id);
   if(idx < ws.length - 1){
-    autoTimer = setTimeout(() => { if(autoNext) go(`#/card/${ws[idx+1].id}`); }, 700);
+    autoTimer = setTimeout(() => { if(autoNext) go(`#/card/${ws[idx+1].id}`); }, 600);
   } else autoNext = false;
+}
+
+player.addEventListener('ended', () => {
+  if(readPass === 1){
+    // 第一遍读完，歇一下再读第二遍
+    readPass = 0;
+    markReading(false);
+    const my = playToken;
+    autoTimer = setTimeout(() => {
+      if(my !== playToken) return;
+      readPass = 2;
+      markReading(true);
+      player.currentTime = 0;
+      player.play().catch(()=>{});
+    }, 450);
+    return;
+  }
+  if(readPass === 2){ readPass = 0; markReading(false); }
+  maybeAdvance();
 });
 
 document.addEventListener('keydown', e => {
