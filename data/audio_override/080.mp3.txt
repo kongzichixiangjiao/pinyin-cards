@@ -1,0 +1,6 @@
+file '/var/folders/nl/7j_s3_r91jbdz3qdglw97ydw0000gn/T/tmp376uhu2y/lead.mp3'
+file '/Users/afeng/Documents/侯佳男/我的我的/04-内容运营/90-工具/04-网页工具/拼音卡片/assets/audio/015_hz.mp3'
+file '/var/folders/nl/7j_s3_r91jbdz3qdglw97ydw0000gn/T/tmp376uhu2y/sil.mp3'
+file '/Users/afeng/Documents/侯佳男/我的我的/04-内容运营/90-工具/04-网页工具/拼音卡片/assets/audio/003_hz.mp3'
+file '/var/folders/nl/7j_s3_r91jbdz3qdglw97ydw0000gn/T/tmp376uhu2y/sil.mp3'
+file '/var/folders/nl/7j_s3_r91jbdz3qdglw97ydw0000gn/T/tmp376uhu2y/s80.mp3'

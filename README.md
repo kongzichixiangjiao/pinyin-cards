@@ -375,3 +375,27 @@ cd build
 python3 build_video.py all --only 7,8,13,45     # 只重出这些单元 + 相关合集/整级/全库
 python3 build_video.py whole                   # 只补「全库一条」
 ```
+
+### L2 拼读卡的「拼读音」
+
+L2 的卡片上写的是 `l — à → là`，所以音频也得读 `l … a … là`，不能读例词"蜡烛"。
+`build/build_blend_audio.py` 负责合成：
+
+| 段 | 来源 |
+|---|---|
+| 声母 | L1 的教材范读（如 `l`） |
+| 介母 / 韵母 | L1 的教材范读（如 `a`、`i`、`u`） |
+| 音节 | 例词里对应那个字做 TTS（"蜡" → là），带正确声调 |
+
+三段之间停 0.35 秒，整体合成到 `data/audio_override/{id}.mp3`。
+
+```bash
+python3 build/build_blend_audio.py --force   # 改了 blend 文本后重跑
+```
+
+### 语速和停顿
+
+- TTS 语速：`build_audio.py` 里 `RATE = "-18%"`（原来是 -10%，偏快）
+- 视频节奏：`build_video.py` 顶部 `LEAD, GAP, TAIL = 0.30, 0.65, 1.10`，
+  每遍读完再多停 0.45 秒，给孩子跟读的时间
+- 改完这两处要重跑音频和视频，否则不会生效

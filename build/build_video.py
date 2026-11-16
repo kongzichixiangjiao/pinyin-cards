@@ -206,7 +206,7 @@ def title_entry(g, sec=1.6):
     return (os.path.join(TITLE_DIR, "%s.png" % g["id"]), None, sec)
 
 
-LEAD, GAP, TAIL = 0.20, 0.45, 0.85
+LEAD, GAP, TAIL = 0.30, 0.65, 1.10
 
 
 def item_seq(it, gap=None, tail=None):
@@ -216,7 +216,7 @@ def item_seq(it, gap=None, tail=None):
     norm = os.path.join(FRAME_DIR, "%03d.png" % it["id"])
     hl = os.path.join(FRAME_DIR, "%03d_hl.png" % it["id"])
     mp3 = os.path.join(AUDIO_DIR, "%03d_hz.mp3" % it["id"])
-    d = max(dur_of(mp3), 0.6) + 0.30      # 语音结束后多停 0.3 秒，高亮不会一闪而过
+    d = max(dur_of(mp3), 0.6) + 0.45      # 语音结束后多停 0.45 秒，留出反应时间
     return [(norm, None, LEAD),
             (hl, mp3, d),
             (norm, None, gap),

@@ -8,7 +8,7 @@ DATA = os.path.join(ROOT, "data", "curriculum.json")
 OUT = os.path.join(ROOT, "assets", "audio")
 
 VOICE = "zh-CN-XiaoyiNeural"
-RATE = "-10%"
+RATE = "-18%"
 SEM = asyncio.Semaphore(4)
 
 # 人工/特殊录音放这里，会覆盖 TTS 结果（--force 也不会冲掉）
