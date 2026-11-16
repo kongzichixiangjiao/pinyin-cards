@@ -1,0 +1,10 @@
+# 本地运行产物，不进仓库
+.DS_Store
+build/frames/
+build/tmp/
+build/__pycache__/
+__pycache__/
+.serve-qr.png
+_frame.html
+_dbg.html
+*.log

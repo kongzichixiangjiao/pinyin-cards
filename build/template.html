@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3f8fc">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<title>一年级拼音 · 从字母到故事</title>
+<style>
+:root{
+  --bg:#f3f8fc; --card:#fff; --ink:#1f2d3d; --soft:#7a8fa6; --line:#e3eef7;
+  --accent:#2f7cbe; --accent-soft:#eaf4fd; --danger:#cc4438;
+  --radius:20px; --shadow:0 6px 24px rgba(45,90,130,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);
+  backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--line);}
+.bar{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-size:18px;font-weight:700;letter-spacing:.4px}
+.brand em{font-style:normal;color:var(--danger)}
+.tabs{display:flex;gap:4px;margin-left:auto;background:var(--accent-soft);padding:4px;border-radius:14px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;color:var(--soft);font-size:14px;padding:8px 13px;
+  border-radius:10px;cursor:pointer;font-family:inherit;transition:.18s;white-space:nowrap}
+.tabs button.on{background:#fff;color:var(--accent);font-weight:600;box-shadow:0 2px 8px rgba(45,90,130,.10)}
+.tabs button.dim{opacity:.55}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--soft);
+  cursor:pointer;user-select:none;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.toggle .dot{width:34px;height:20px;border-radius:20px;background:#dbe7f1;position:relative;transition:.2s}
+.toggle .dot::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on{color:var(--accent)}
+.toggle.on .dot{background:var(--accent)}
+.toggle.on .dot::after{left:17px}
+
+main{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
+.crumb{font-size:13px;color:var(--soft);margin-bottom:14px}
+.crumb a{color:var(--accent);text-decoration:none}
+.lv-head{margin-bottom:26px}
+.lv-head h1{font-size:26px;margin:0 0 6px}
+.lv-head p{margin:0;color:var(--soft);font-size:14px}
+.section{margin:0 0 32px}
+.section h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:10px;font-weight:600}
+.section h2 i{font-style:normal;font-size:13px;color:var(--soft);font-weight:400}
+.section h2::before{content:"";width:4px;height:17px;border-radius:3px;background:var(--accent)}
+.section h2 a{margin-left:auto;font-size:13px;color:var(--accent);text-decoration:none}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px}
+.tile{background:var(--card);border-radius:var(--radius);overflow:hidden;cursor:pointer;
+  box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s;position:relative;
+  border:1px solid rgba(227,238,247,.9)}
+.tile:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(45,90,130,.14)}
+.tile img{display:block;width:100%;height:auto}
+.tile .play{position:absolute;right:9px;bottom:9px;width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.92);border:1px solid var(--line);display:flex;align-items:center;
+  justify-content:center;font-size:14px;color:var(--accent);opacity:0;transition:.18s}
+.tile:hover .play{opacity:1}
+
+.stage{display:flex;flex-direction:column;align-items:center;padding-top:6px}
+.meta-line{font-size:14px;color:var(--soft);margin-bottom:14px}
+.meta-line b{color:var(--accent);font-weight:600}
+.stage-card{width:min(540px,92vw);border-radius:26px;overflow:hidden;background:#fff;
+  box-shadow:0 18px 50px rgba(45,90,130,.16);cursor:pointer}
+.stage-card img{display:block;width:100%;height:auto}
+.nav-row{display:flex;align-items:center;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);font-family:inherit;font-size:15px;
+  padding:12px 18px;border-radius:14px;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#266aa4;color:#fff}
+.btn.round{width:52px;height:52px;border-radius:50%;justify-content:center;padding:0;font-size:18px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.progress{width:min(540px,92vw);height:5px;border-radius:4px;background:#e4eef7;margin-top:20px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .25s}
+.day-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.empty{text-align:center;color:var(--soft);padding:48px 24px;background:#fff;border-radius:var(--radius);
+  box-shadow:var(--shadow);line-height:1.9;font-size:15px}
+.empty b{color:var(--accent)}
+.hint{font-size:13px;color:var(--soft);margin-top:14px;text-align:center;line-height:2}
+.hint kbd{background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;
+  padding:1px 7px;font-family:inherit;font-size:12px;color:var(--ink)}
+html{-webkit-text-size-adjust:100%}
+img{max-width:100%}
+.hint .tc{display:none}
+
+/* ---------- 邀请码门 ---------- */
+#gate{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+  padding:24px;background:linear-gradient(160deg,#f3f8fc,#e3f0fb)}
+#gate.show{display:flex}
+.gate-box{width:100%;max-width:340px;background:#fff;border-radius:22px;padding:26px 22px;
+  box-shadow:0 18px 50px rgba(45,90,130,.18);text-align:center}
+.gate-box .logo{font-size:34px;line-height:1;margin-bottom:10px}
+.gate-box h3{margin:0 0 8px;font-size:19px}
+.gate-box p{margin:0 0 18px;font-size:13px;color:var(--soft);line-height:1.7}
+.gate-box input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;
+  font-size:17px;font-family:inherit;text-align:center;letter-spacing:.18em;text-transform:uppercase;
+  outline:none;background:#fbfdff;color:var(--ink)}
+.gate-box input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.gate-box button{width:100%;margin-top:12px;padding:13px;border:0;border-radius:12px;
+  background:var(--accent);color:#fff;font-size:15px;font-family:inherit;cursor:pointer}
+.gate-box button:active{background:#266aa4}
+.gate-err{color:var(--danger);font-size:13px;margin-top:10px;min-height:18px}
+.gate-foot{font-size:12px;color:var(--soft);margin-top:14px;line-height:1.8}
+
+@media (hover:none){
+  .hint .kd{display:none}
+  .hint .tc{display:inline}
+}
+
+@media (max-width:640px){
+  header{padding-top:env(safe-area-inset-top)}
+  .bar{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:8px 12px}
+  .brand{font-size:15px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tabs{grid-column:1/-1;grid-row:2;margin-left:0;flex-wrap:nowrap;overflow-x:auto;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:3px;border-radius:12px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:7px 10px;font-size:12.5px;border-radius:9px}
+  .toggle{padding:5px 9px;font-size:12px;gap:6px;border-radius:10px;white-space:nowrap}
+  .toggle .dot{width:30px;height:18px}
+  .toggle .dot::after{width:12px;height:12px;top:3px;left:3px}
+  .toggle.on .dot::after{left:15px}
+
+  main{padding:14px 12px calc(64px + env(safe-area-inset-bottom))}
+  .lv-head{margin-bottom:18px}
+  .lv-head h1{font-size:20px}
+  .lv-head p{font-size:13px}
+  .section{margin-bottom:24px}
+  .section h2{font-size:15px}
+  .section h2 a{display:none}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:9px}
+  .tile{border-radius:16px}
+  .tile:hover{transform:none;box-shadow:var(--shadow)}
+  .tile .play{opacity:1;width:26px;height:26px;right:6px;bottom:6px;font-size:11px}
+
+  .day-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .day-actions .btn{justify-content:center;padding:11px 8px;font-size:13px;line-height:1.3;
+    white-space:normal;text-align:center;min-height:44px}
+
+  .crumb{font-size:12px;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta-line{font-size:12.5px;margin-bottom:10px}
+  .stage{padding-top:0}
+  .stage-card{width:min(100%,440px);border-radius:20px}
+  .progress{margin-top:14px;width:100%}
+  .nav-row{gap:8px;margin-top:16px;width:100%;max-width:440px}
+  .nav-row .btn{padding:11px 12px;font-size:14px}
+  .nav-row .btn.round{width:46px;height:46px;font-size:17px}
+  .nav-row #say{flex:1 1 100%;order:-1}
+  .hint{font-size:12.5px;line-height:1.9;margin-top:12px}
+  .hint .kd{display:none}
+  .hint .tc{display:inline}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">一年级拼音 <em>·</em> 从字母到故事</div>
+    <div class="tabs" id="tabs"></div>
+    <div class="toggle" id="pinyinToggle"><span class="dot"></span><span>显示答案</span></div>
+  </div>
+</header>
+<main id="app"></main>
+<audio id="player" preload="auto"></audio>
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="logo">📖</div>
+    <h3>一年级拼音 · 从字母到故事</h3>
+    <p>请输入老师/家长群里发的<br><b>6 位邀请码</b></p>
+    <input id="gateInput" inputmode="latin" autocomplete="off" autocapitalize="characters"
+      spellcheck="false" maxlength="8" placeholder="邀请码">
+    <button id="gateBtn">进入</button>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-foot">验证一次就记住了，不用每次输</div>
+  </div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/{};
+const LEVELS = DATA.levels;
+const META = DATA.meta;
+
+/* ---------- 邀请码（纯前端白名单，只防随手转发） ---------- */
+const GATE_ON = /*__GATE__*/false;
+const INVITE_CODES = /*__CODES__*/[];
+const GATE_KEY = 'py_gate_v1';
+
+function gatePassed(){
+  if(!GATE_ON) return true;
+  if(location.protocol === 'file:') return true;            // 本地双击直接用
+  const k = new URLSearchParams(location.search).get('k');
+  if(k && INVITE_CODES.includes(k.trim().toUpperCase())){
+    localStorage.setItem(GATE_KEY, '1');
+    history.replaceState(null, '', location.pathname + location.hash);  // 把 k 从地址栏抹掉
+    return true;
+  }
+  return localStorage.getItem(GATE_KEY) === '1';
+}
+
+/* 扁平索引：id -> {item, level, group} */
+const IDX = {};
+LEVELS.forEach(lv => lv.groups.forEach(g => g.items.forEach(it => IDX[it.id] = {item: it, level: lv, group: g})));
+const ALL_ITEMS = Object.values(IDX).map(x => x.item);
+
+const app = document.getElementById('app');
+const player = document.getElementById('player');
+let showAnswer = localStorage.getItem('py') !== '0';
+let autoNext = false, autoTimer = null;
+let curLevel = LEVELS[0].code;
+
+const pad3 = n => String(n).padStart(3, '0');
+const kindOf = () => showAnswer ? 'card' : 'blank';
+/* 展示图 720 WebP / 列表缩略图 320 WebP / png 只在老浏览器兜底 */
+const imgOf = it => `assets/cards/web/${pad3(it.id)}_${kindOf()}.webp`;
+const thumbOf = it => `assets/cards/thumb/${pad3(it.id)}_${kindOf()}.webp`;
+const pngOf = it => `assets/cards/${pad3(it.id)}_${kindOf()}.png`;
+const audioOf = it => `assets/audio/${pad3(it.id)}_hz.mp3`;
+
+function playItem(it){
+  player.pause(); player.src = audioOf(it); player.currentTime = 0;
+  player.play().catch(()=>{});
+}
+
+/* ---------- 顶部层级页签 ---------- */
+function drawTabs(){
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = LEVELS.map(lv => {
+    const n = lv.groups.reduce((s,g)=>s+g.items.length,0);
+    const cls = (lv.code === curLevel ? 'on' : '') + (n ? '' : ' dim');
+    return `<button class="${cls}" data-code="${lv.code}">${lv.code} ${lv.name}${n?` <i style="font-style:normal;opacity:.6">${n}</i>`:''}</button>`;
+  }).join('');
+  tabs.querySelectorAll('button').forEach(b => {
+    b.onclick = () => go(`#/l/${b.dataset.code}`);
+  });
+}
+
+function setAnswer(v){
+  showAnswer = v;
+  localStorage.setItem('py', v ? '1' : '0');
+  document.getElementById('pinyinToggle').classList.toggle('on', v);
+  render();
+}
+document.getElementById('pinyinToggle').onclick = () => setAnswer(!showAnswer);
+
+/* ---------- 路由 ---------- */
+function go(hash){
+  if(location.hash === hash) render(); else location.hash = hash;
+}
+function route(){
+  clearTimeout(autoTimer);
+  const seg = location.hash.replace(/^#\/?/, '').split('/');
+  const v = seg[0] || 'l';
+  if(v === 'card' && seg[1]){ const x = IDX[+seg[1]]; curLevel = x ? x.level.code : curLevel; }
+  if(v === 'g' && seg[1]){ const g = findGroup(seg[1]); curLevel = g ? g.level.code : curLevel; }
+  if(v === 'l' && seg[1]) curLevel = seg[1];
+  drawTabs();
+  render();
+  window.scrollTo({top:0, behavior:'instant'});
+}
+window.addEventListener('hashchange', route);
+
+function findGroup(gid){
+  for(const lv of LEVELS) for(const g of lv.groups) if(g.id === gid) return {group: g, level: lv};
+  return null;
+}
+
+function render(){
+  const seg = location.hash.replace(/^#\/?/, '').split('/');
+  const v = seg[0] || 'l';
+  if(v === 'card' && seg[1]) return renderCard(+seg[1]);
+  if(v === 'g' && seg[1]){ const f = findGroup(seg[1]); if(f) return renderGroup(f.group, f.level); }
+  const lv = LEVELS.find(l => l.code === seg[1]) || LEVELS.find(l => l.code === curLevel) || LEVELS[0];
+  renderLevel(lv);
+}
+
+/* ---------- 层级总览 ---------- */
+function tileHTML(it, group){
+  return `<div class="tile" data-id="${it.id}">
+    <img loading="lazy" decoding="async" width="320" height="320"
+      src="${thumbOf(it)}" onerror="this.onerror=null;this.src='${pngOf(it)}'" alt="${it.text}">
+    <div class="play" data-audio="${it.id}">🔊</div>
+  </div>`;
+}
+function bindTiles(){
+  app.querySelectorAll('.tile').forEach(el => {
+    el.onclick = e => {
+      const ab = e.target.closest('[data-audio]');
+      const it = IDX[+el.dataset.id].item;
+      if(ab){ e.stopPropagation(); playItem(it); return; }
+      go(`#/card/${it.id}`);
+    };
+  });
+}
+
+function renderLevel(lv){
+  const n = lv.groups.reduce((s,g)=>s+g.items.length,0);
+  let html = `<div class="lv-head">
+      <h1>${lv.code} · ${lv.name}</h1>
+      <p>${lv.desc || ''}${n ? ` · 共 ${lv.groups.length} 组 ${n} 个单元` : ''}</p>
+    </div>`;
+
+  if(n){
+    html += `<div class="day-actions">
+      <button class="btn primary" id="lvVid">🎬 整级合集（${n} 个连读）</button>
+      <button class="btn" id="allVid">📺 全库合集（${ALL_ITEMS.length} 个）</button>
+    </div>`;
+  }
+
+  if(!n){
+    html += `<div class="empty">
+      <div style="font-size:15px">这一级还没开始做</div>
+      <div style="margin-top:8px">${lv.todo ? '计划：<b>' + lv.todo + '</b>' : '先把前面的级别跑顺，再往上加'}</div>
+      <div style="margin-top:14px;font-size:13px">内容的源头是 <b>data/curriculum.json</b>，加进去就自动出卡、出音、出片</div>
+    </div>`;
+    app.innerHTML = html;
+    return;
+  }
+
+  html += lv.groups.map(g => `
+    <section class="section">
+      <h2>${g.name} <i>${g.items.length} 个</i>
+        <a href="#/g/${g.id}">单独看这组 →</a></h2>
+      <div class="grid">${g.items.map(it => tileHTML(it, g)).join('')}</div>
+    </section>`).join('');
+
+  html += `<div class="hint">
+    <span class="kd">共 ${ALL_ITEMS.length} 个单元 ·
+    <kbd>←</kbd> <kbd>→</kbd> 翻页 · <kbd>空格</kbd> 发音 · <kbd>P</kbd> 答案 · <kbd>Esc</kbd> 返回</span>
+    <span class="tc">共 ${ALL_ITEMS.length} 个单元 · 点卡片进入 · 🔊 直接听</span>
+  </div>`;
+  app.innerHTML = html;
+  bindTiles();
+  const lvVid = document.getElementById('lvVid');
+  if(lvVid) lvVid.onclick = () =>
+    window.open(`output/video/level/${lv.code}_${lv.name}_整级合集.mp4`, '_blank');
+  const allVid = document.getElementById('allVid');
+  if(allVid) allVid.onclick = () =>
+    window.open(`output/video/all/拼音全集_${ALL_ITEMS.length}个.mp4`, '_blank');
+}
+
+/* ---------- 单组 ---------- */
+function renderGroup(g, lv){
+  const i = lv.groups.findIndex(x => x.id === g.id);
+  const prev = lv.groups[i-1], next = lv.groups[i+1];
+  const isWord = g.kind === 'word';
+  const canVid = g.items.length >= 3;
+  app.innerHTML = `
+    <div class="crumb"><a href="#/l/${lv.code}">${lv.code} ${lv.name}</a> / ${g.name}</div>
+    <div class="day-actions">
+      <button class="btn primary" id="playAll">▶ 顺序连播（${g.items.length} 个）</button>
+      ${canVid ? `<button class="btn" id="toVid">🎬 看合集视频</button>` : ''}
+      ${isWord ? `<button class="btn" id="toSheet">🖨 打印这组纸条</button>` : ''}
+      ${prev ? `<button class="btn" data-g="${prev.id}">← ${prev.name}</button>` : ''}
+      ${next ? `<button class="btn" data-g="${next.id}">${next.name} →</button>` : ''}
+    </div>
+    <div class="grid">${g.items.map(it => tileHTML(it, g)).join('')}</div>`;
+  bindTiles();
+  app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => go(`#/g/${b.dataset.g}`));
+  document.getElementById('playAll').onclick = () => { autoNext = true; go(`#/card/${g.items[0].id}`); };
+  const v = document.getElementById('toVid');
+  if(v) v.onclick = () => window.open(`output/video/group/${g.id}_${g.name}_合集.mp4`, '_blank');
+  const s = document.getElementById('toSheet');
+  if(s) s.onclick = () => window.open(`assets/sheet/${g.id}_${showAnswer?'answer':'exercise'}.png`, '_blank');
+}
+
+/* ---------- 单卡 ---------- */
+function renderCard(id){
+  const x = IDX[id];
+  if(!x){ app.innerHTML = `<div class="empty">找不到这个单元</div>`; return; }
+  const {item, group, level} = x;
+  const ws = group.items, idx = ws.findIndex(i => i.id === id);
+  const first = idx === 0, last = idx === ws.length - 1;
+  app.innerHTML = `
+    <div class="crumb"><a href="#/l/${level.code}">${level.code} ${level.name}</a> /
+      <a href="#/g/${group.id}">${group.name}</a> / ${item.text}</div>
+    <div class="stage">
+      <div class="meta-line">${group.name} · 第 <b>${idx+1}</b> / ${ws.length} 个 · 全库 ${ALL_ITEMS.length} 个</div>
+      <div class="stage-card" id="bigCard"><img decoding="async" width="720" height="720"
+        src="${imgOf(item)}" onerror="this.onerror=null;this.src='${pngOf(item)}'" alt="${item.text}"></div>
+      <div class="progress"><i style="width:${(idx+1)/ws.length*100}%"></i></div>
+      <div class="nav-row">
+        <button class="btn round" id="prev" ${first?'disabled':''}>‹</button>
+        <button class="btn primary" id="say">🔊 读一遍</button>
+        <button class="btn" id="autoBtn">${autoNext?'⏸ 停止连播':'▶ 连播'}</button>
+        <button class="btn" id="vidBtn">🎬 单条视频</button>
+        <button class="btn round" id="next" ${last?'disabled':''}>›</button>
+      </div>
+      <div class="hint">
+        <span class="kd"><kbd>←</kbd> <kbd>→</kbd> 翻页 · <kbd>空格</kbd> 重读 · <kbd>P</kbd> 藏答案 ·
+        <kbd>Esc</kbd> 回「${group.name}」 · 点卡片也能发音</span>
+        <span class="tc">左右滑动翻页 · 点卡片发音</span>
+      </div>
+    </div>`;
+
+  document.getElementById('prev').onclick = () => !first && go(`#/card/${ws[idx-1].id}`);
+  document.getElementById('next').onclick = () => !last && go(`#/card/${ws[idx+1].id}`);
+  document.getElementById('say').onclick = () => playItem(item);
+  document.getElementById('bigCard').onclick = () => playItem(item);
+  document.getElementById('vidBtn').onclick = () =>
+    window.open(`output/video/single/${pad3(item.id)}_${item.text}.mp4`, '_blank');
+  document.getElementById('autoBtn').onclick = () => { autoNext = !autoNext; render(); if(autoNext) playItem(item); };
+
+  const pre = ws[idx+1]; if(pre) new Image().src = imgOf(pre);
+  playItem(item);
+}
+
+player.addEventListener('ended', () => {
+  if(!autoNext) return;
+  const seg = location.hash.replace(/^#\/?/, '').split('/');
+  if(seg[0] !== 'card') return;
+  const x = IDX[+seg[1]]; if(!x) return;
+  const ws = x.group.items, idx = ws.findIndex(i => i.id === x.item.id);
+  if(idx < ws.length - 1){
+    autoTimer = setTimeout(() => { if(autoNext) go(`#/card/${ws[idx+1].id}`); }, 700);
+  } else autoNext = false;
+});
+
+document.addEventListener('keydown', e => {
+  const seg = location.hash.replace(/^#\/?/, '').split('/');
+  if(seg[0] !== 'card'){
+    if(e.key === 'p' || e.key === 'P') setAnswer(!showAnswer);
+    return;
+  }
+  const x = IDX[+seg[1]]; if(!x) return;
+  const ws = x.group.items, idx = ws.findIndex(i => i.id === x.item.id);
+  if(e.key === 'ArrowLeft' && idx > 0) go(`#/card/${ws[idx-1].id}`);
+  else if(e.key === 'ArrowRight' && idx < ws.length-1) go(`#/card/${ws[idx+1].id}`);
+  else if(e.key === ' '){ e.preventDefault(); playItem(x.item); }
+  else if(e.key === 'p' || e.key === 'P') setAnswer(!showAnswer);
+  else if(e.key === 'Escape') go(`#/g/${x.group.id}`);
+});
+
+let tx = 0;
+document.addEventListener('touchstart', e => tx = e.touches[0].clientX, {passive:true});
+document.addEventListener('touchend', e => {
+  const seg = location.hash.replace(/^#\/?/, '').split('/');
+  if(seg[0] !== 'card') return;
+  const x = IDX[+seg[1]]; if(!x) return;
+  const dx = e.changedTouches[0].clientX - tx;
+  if(Math.abs(dx) < 60) return;
+  const ws = x.group.items, idx = ws.findIndex(i => i.id === x.item.id);
+  if(dx < 0 && idx < ws.length-1) go(`#/card/${ws[idx+1].id}`);
+  if(dx > 0 && idx > 0) go(`#/card/${ws[idx-1].id}`);
+}, {passive:true});
+
+/* ---------- 启动 ---------- */
+function start(){
+  document.getElementById('pinyinToggle').classList.toggle('on', showAnswer);
+  if(!location.hash) location.hash = `#/l/${LEVELS[0].code}`;
+  route();
+}
+
+if(gatePassed()){
+  start();
+}else{
+  const gate = document.getElementById('gate');
+  const inp = document.getElementById('gateInput');
+  const err = document.getElementById('gateErr');
+  gate.classList.add('show');
+  const submit = () => {
+    const v = (inp.value || '').trim().toUpperCase();
+    if(INVITE_CODES.includes(v)){
+      localStorage.setItem(GATE_KEY, '1');
+      gate.classList.remove('show');
+      start();
+    }else{
+      err.textContent = '邀请码不对，再核对一下';
+      inp.select();
+    }
+  };
+  document.getElementById('gateBtn').onclick = submit;
+  inp.addEventListener('keydown', e => { if(e.key === 'Enter') submit(); });
+  setTimeout(() => inp.focus(), 60);
+}
+</script>
+</body>
+</html>
