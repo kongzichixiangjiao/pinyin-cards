@@ -104,15 +104,18 @@ def build_frames(data):
     return n
 
 
-def build_singles(data):
+def build_singles(data, only=None):
     os.makedirs(V_SINGLE, exist_ok=True)
-    for f in os.listdir(V_SINGLE):
-        if f.endswith(".mp4"):
-            os.remove(os.path.join(V_SINGLE, f))
+    if not only:
+        for f in os.listdir(V_SINGLE):
+            if f.endswith(".mp4"):
+                os.remove(os.path.join(V_SINGLE, f))
     n = 0
     for lv in data["levels"]:
         for g in lv["groups"]:
             for it in g["items"]:
+                if only and it["id"] not in only:
+                    continue
                 out = os.path.join(V_SINGLE, f"{it['id']:03d}_{it['text']}.mp4")
                 concat_video(out, item_seq(it, tail=1.0), "s_%03d" % it["id"])
                 n += 1
@@ -228,14 +231,17 @@ def _clean(d):
                 os.remove(os.path.join(d, f))
 
 
-def build_groups(data):
+def build_groups(data, only=None):
     """每组一条：直接连读，不插章节页"""
     os.makedirs(V_GROUP, exist_ok=True)
-    _clean(V_GROUP)
+    if not only:
+        _clean(V_GROUP)
     n = 0
     for lv in data["levels"]:
         for g in lv["groups"]:
             if len(g["items"]) < 3:
+                continue
+            if only and not any(it["id"] in only for it in g["items"]):
                 continue
             seq = []
             for it in g["items"]:
@@ -246,14 +252,17 @@ def build_groups(data):
     return n
 
 
-def build_levels(data):
+def build_levels(data, only=None):
     """每级一条：组与组之间插章节页"""
     os.makedirs(V_LEVEL, exist_ok=True)
-    _clean(V_LEVEL)
+    if not only:
+        _clean(V_LEVEL)
     n = 0
     for lv in data["levels"]:
         groups = [g for g in lv["groups"] if g["items"]]
         if not groups:
+            continue
+        if only and not any(it["id"] in only for g in groups for it in g["items"]):
             continue
         seq = []
         for g in groups:
@@ -289,12 +298,22 @@ def build_all(data):
 if __name__ == "__main__":
     with open(DATA, encoding="utf-8") as f:
         data = json.load(f)
-    mode = sys.argv[1] if len(sys.argv) > 1 else "all"
+    positional = [a for a in sys.argv[1:] if not a.startswith("--")]
+    mode = positional[0] if positional else "all"
+
+    only = None
+    if "--only" in sys.argv:
+        i = sys.argv.index("--only")
+        if i + 1 < len(sys.argv):
+            only = {int(x) for x in sys.argv[i + 1].replace(" ", "").split(",") if x}
+            print(f"只重出 {len(only)} 个单元相关的视频")
+
     print(f"底图 -> {build_frames(data)} 张 1080x1920")
     build_titles(data)
     if mode in ("all", "single"):
-        print(f"单条视频 -> {build_singles(data)} 条")
+        print(f"单条视频 -> {build_singles(data, only)} 条")
     if mode in ("all", "group"):
-        print(f"每组一条 -> {build_groups(data)} 条")
-        print(f"每级一条 -> {build_levels(data)} 条")
+        print(f"每组一条 -> {build_groups(data, only)} 条")
+        print(f"每级一条 -> {build_levels(data, only)} 条")
+    if mode in ("all", "group", "whole"):
         print(f"全库一条 -> {build_all(data)} 条")
