@@ -281,8 +281,8 @@ def build_all(data):
                 seq += item_seq(it, gap=0.35, tail=0.55)
     if not seq:
         return 0
-    concat_video(os.path.join(V_ALL, "拼音全集_%d个.mp4" % (len(seq) - len([1 for l in levels for g in l["groups"] if g["items"]]))),
-                 seq, "all")
+    n_items = sum(len(g["items"]) for lv in levels for g in lv["groups"])
+    concat_video(os.path.join(V_ALL, "拼音全集_%d个.mp4" % n_items), seq, "all")
     return 1
 
 
