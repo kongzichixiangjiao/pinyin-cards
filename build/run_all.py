@@ -5,6 +5,7 @@ import os, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 STEPS = [
     ("卡片图 + 小纸条", ["build_cards.py"]),
+    ("卡片图瘦身 (webp)", ["optimize_images.py"]),
     ("读音配音 (edge-tts)", ["build_audio.py"]),
     ("视频合成 (ffmpeg)", ["build_video.py"]),
     ("交互页 index.html", ["build_index.py"]),

@@ -411,7 +411,8 @@ function renderCard(id){
     <div class="stage">
       <div class="meta-line">${group.name} · 第 <b>${idx+1}</b> / ${ws.length} 个 · 全库 ${ALL_ITEMS.length} 个</div>
       <div class="stage-card" id="bigCard"><img decoding="async" width="720" height="720"
-        src="${imgOf(item)}" onerror="this.onerror=null;this.src='${pngOf(item)}'" alt="${item.text}"></div>
+        src="${imgOf(item)}" onerror="this.onerror=null;this.src='${pngOf(item)}'" alt="${item.text}">
+        <div class="hl" id="hlBox"></div></div>
       <div class="progress"><i style="width:${(idx+1)/ws.length*100}%"></i></div>
       <div class="nav-row">
         <button class="btn round" id="prev" ${first?'disabled':''}>‹</button>
